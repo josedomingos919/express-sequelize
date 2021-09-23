@@ -4,9 +4,9 @@ This is a simple but powerful example to how to use the sequalize to make NodeJS
 
 ### Instalation
 
-1- clone the repository
-2- in the console run yarn or npm install 
-3- yarn start or npm start 
+- 1- clone the repository
+- 2- in the console run yarn or npm install 
+- 3- yarn start or npm start 
 
 ### Feature
 
