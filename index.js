@@ -22,7 +22,25 @@ app.post('/users', (req, res) => {
 })
 
 app.get('/users', async (req, res) => {
-  res.send(await User.findAll())
+  let { limit, page } = req.query
+
+  page = Math.abs(Number.parseInt(page))
+  limit = Math.abs(Number.parseInt(limit))
+
+  if (page < 1) {
+    return res.send({ message: 'Invalid page number!' })
+  }
+
+  const result = await User.findAndCountAll({
+    limit: limit,
+    offset: (page - 1) * limit,
+  })
+
+  res.send({
+    rows: result.rows,
+    totalPage: result.count / limit,
+    totalRegister: result.count,
+  })
 })
 
 app.get('/users/:id', async (req, res) => {
