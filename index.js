@@ -1,6 +1,5 @@
 const express = require('express')
 
-/*DB*/
 const db = require('./database.js')
 db.sync({
   // force: true,
