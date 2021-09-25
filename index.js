@@ -43,6 +43,7 @@ app.get('/users', async (req, res) => {
   })
 })
 
+/* Error handling */
 function InvalidException() {
   this.status = 400
   this.message = 'Invalid ID!'
@@ -53,13 +54,19 @@ function UserNotFaundException() {
   this.message = 'User not found!'
 }
 
-app.get('/users/:id', async (req, res, next) => {
+/*Middleware*/
+const numberControl = (req, res, next) => {
   const userID = Number.parseInt(req.params.id)
 
   if (Number.isNaN(userID)) {
-    next(new InvalidException())
+    throw new InvalidException()
   }
 
+  next()
+}
+
+app.get('/users/:id', numberControl, async (req, res, next) => {
+  const userID = Number.parseInt(req.params.id)
   const user = await User.findOne({
     where: { id: userID },
   })
@@ -71,7 +78,7 @@ app.get('/users/:id', async (req, res, next) => {
   res.send(user || [])
 })
 
-app.put('/users/:id', async (req, res) => {
+app.put('/users/:id', numberControl, async (req, res) => {
   const userID = req.params.id
 
   const user = await User.findOne({
@@ -90,7 +97,7 @@ app.put('/users/:id', async (req, res) => {
   res.send({ message: 'Updated as sucess fully!', updated: true })
 })
 
-app.delete('/users/:id', async (req, res) => {
+app.delete('/users/:id', numberControl, async (req, res) => {
   const userID = req.params.id
 
   const user = await User.destroy({
@@ -101,13 +108,11 @@ app.delete('/users/:id', async (req, res) => {
 })
 
 app.use((err, req, res, next) => {
-  return res
-    .status(err.status)
-    .send({
-      message: err.message,
-      timestamp: Date.now(),
-      path: req.originalUrl,
-    })
+  return res.status(err.status).send({
+    message: err.message,
+    timestamp: Date.now(),
+    path: req.originalUrl,
+  })
 })
 
 app.listen(3000, () => {
