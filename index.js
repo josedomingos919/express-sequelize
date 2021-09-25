@@ -43,22 +43,18 @@ app.get('/users', async (req, res) => {
   })
 })
 
-app.get('/users/:id', (req, res) => {
+app.get('/users/:id', async (req, res, next) => {
   const userID = Number.parseInt(req.params.id)
 
   if (Number.isNaN(userID)) {
-    /*return res.status(400).send({
-      message: 'Invalid ID',
-    }) */
-
-    throw new Error('Invalid ID')
+    next(new Error('Invalid ID'))
   }
-  /*
+
   const user = await User.findOne({
     where: { id: userID },
   })
 
-  res.send(user || []) */
+  res.send(user || [])
 })
 
 app.put('/users/:id', async (req, res) => {
