@@ -23,6 +23,7 @@ This is a simple but powerful example to how to use the sequalize to make NodeJS
 - Sequelize
 - SQLite3
 - Middleware
+- ESlint
 
 ### Other Used knowlage 
 
