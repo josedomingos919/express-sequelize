@@ -15,7 +15,7 @@ const app = express()
 app.use(express.json()) // we use it to accept json rquest data
 
 /*User routes*/
-app.post('/users', (req, res) => {
+app.post('/users', async (req, res) => {
   User.create(req.body).then(() => {
     res.send('user is inserted!')
   })
@@ -38,18 +38,27 @@ app.get('/users', async (req, res) => {
 
   res.send({
     rows: result.rows,
-    totalPage: result.count / limit,
+    totalPage: parseInt((result.count / limit).toString().split('.')[0]),
     totalRegister: result.count,
   })
 })
 
-app.get('/users/:id', async (req, res) => {
-  const userID = req.params.id
+app.get('/users/:id', (req, res) => {
+  const userID = Number.parseInt(req.params.id)
+
+  if (Number.isNaN(userID)) {
+    /*return res.status(400).send({
+      message: 'Invalid ID',
+    }) */
+
+    throw new Error('Invalid ID')
+  }
+  /*
   const user = await User.findOne({
     where: { id: userID },
   })
 
-  res.send(user || [])
+  res.send(user || []) */
 })
 
 app.put('/users/:id', async (req, res) => {
@@ -79,6 +88,10 @@ app.delete('/users/:id', async (req, res) => {
   })
 
   res.send({ message: 'user was remuved!', remuved: true })
+})
+
+app.use((err, req, res, next) => {
+  return res.status(400).send({ message: err.message })
 })
 
 app.listen(3000, () => {
