@@ -43,16 +43,30 @@ app.get('/users', async (req, res) => {
   })
 })
 
+function InvalidException() {
+  this.status = 400
+  this.message = 'Invalid ID!'
+}
+
+function UserNotFaundException() {
+  this.status = 401
+  this.message = 'User not found!'
+}
+
 app.get('/users/:id', async (req, res, next) => {
   const userID = Number.parseInt(req.params.id)
 
   if (Number.isNaN(userID)) {
-    next(new Error('Invalid ID'))
+    next(new InvalidException())
   }
 
   const user = await User.findOne({
     where: { id: userID },
   })
+
+  if (!user) {
+    next(new UserNotFaundException())
+  }
 
   res.send(user || [])
 })
@@ -87,7 +101,13 @@ app.delete('/users/:id', async (req, res) => {
 })
 
 app.use((err, req, res, next) => {
-  return res.status(400).send({ message: err.message })
+  return res
+    .status(err.status)
+    .send({
+      message: err.message,
+      timestamp: Date.now(),
+      path: req.originalUrl,
+    })
 })
 
 app.listen(3000, () => {
